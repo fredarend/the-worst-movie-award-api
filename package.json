@@ -9,6 +9,12 @@
   "author": "Frederico Arend Binsfeld",
   "license": "ISC",
   "devDependencies": {
+    "@types/node": "^22.13.4",
     "git-commit-msg-linter": "^5.0.8"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "knex": "^3.1.0",
+    "objection": "^3.1.5"
   }
 }
