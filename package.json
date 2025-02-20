@@ -9,6 +9,7 @@
   "author": "Frederico Arend Binsfeld",
   "license": "ISC",
   "devDependencies": {
+    "@types/express": "^5.0.0",
     "@types/node": "^22.13.4",
     "git-commit-msg-linter": "^5.0.8"
   },
