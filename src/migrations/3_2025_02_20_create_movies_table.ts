@@ -10,6 +10,8 @@ export const up = async (knex: Knex): Promise<void> => {
     table.foreign("studio_id").references("id").inTable("studios");
     table.integer("producer_id").unsigned().notNullable();
     table.foreign("producer_id").references("id").inTable("producers");
+    table.timestamp("updated_at").defaultTo(knex.fn.now());
+    table.timestamp("created_at").defaultTo(knex.fn.now());
   });
 };
 
