@@ -1,10 +1,10 @@
 import knex from "knex";
 import path from "path";
 
-const db = knex({
+export const db = knex({
   client: "sqlite3",
   connection: {
-    filename: ":memory:",
+    filename: "./dev.sqlite",
   },
   useNullAsDefault: true,
   migrations: {
@@ -12,5 +12,3 @@ const db = knex({
     directory: path.join(__dirname, "../migrations"),
   },
 });
-
-export default db;
