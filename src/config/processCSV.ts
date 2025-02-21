@@ -3,13 +3,19 @@ import csvParser from "csv-parser";
 
 import {
   ProducersRepository,
-  MoviesRepository,
+  AwardsRepository,
   StudiosRepository,
+  AwardsProducersRepository,
+  AwardsStudiosRepository,
 } from "../repositories";
 
-import { IProducersInsertAll } from "../types/producers.types";
-import { IStudiosInsertAll } from "../types/studios.types";
-import { IMoviesInsertAll } from "../types/movies.types";
+import {
+  IAwardsInsertAll,
+  IAwardsProducersInsertAll,
+  IAwardsStudiosInsertAll,
+  IProducersInsertAll,
+  IStudiosInsertAll,
+} from "../types";
 
 interface ICsvRow {
   title: string;
@@ -22,28 +28,23 @@ interface ICsvRow {
 class ProcessCSV {
   private readonly studiosRepository: StudiosRepository;
   private readonly producersRepository: ProducersRepository;
-  private readonly moviesRepository: MoviesRepository;
+  private readonly awardsRepository: AwardsRepository;
+  private readonly awardsProducersRepository: AwardsProducersRepository;
+  private readonly awardsStudiosRepository: AwardsStudiosRepository;
 
   constructor() {
     this.studiosRepository = new StudiosRepository();
     this.producersRepository = new ProducersRepository();
-    this.moviesRepository = new MoviesRepository();
+    this.awardsRepository = new AwardsRepository();
+    this.awardsProducersRepository = new AwardsProducersRepository();
+    this.awardsStudiosRepository = new AwardsStudiosRepository();
   }
 
   async run() {
     try {
       const response = await this.processCSV();
 
-      if (response?.movies && response?.producers && response?.studios) {
-        const { movies, producers, studios } = response;
-
-        await this.insertData({ producers, studios, movies });
-
-        console.log("Data successfully inserted into database");
-        return;
-      }
-
-      console.log("No data to insert into database");
+      await this.insertData(response);
     } catch (error) {
       throw error;
     }
@@ -53,7 +54,9 @@ class ProcessCSV {
     try {
       const producersMap = new Map<string, number>();
       const studiosMap = new Map<string, number>();
-      const movies: IMoviesInsertAll[] = [];
+      const awards: IAwardsInsertAll[] = [];
+      const awardsProducers: IAwardsProducersInsertAll[] = [];
+      const awardsStudios: IAwardsStudiosInsertAll[] = [];
 
       await new Promise<void>((resolve, reject) => {
         console.log("Processing CSV file...");
@@ -63,20 +66,51 @@ class ProcessCSV {
           .on("data", (row: ICsvRow) => {
             const { year, title, winner, producers, studios } = row;
 
-            if (!producersMap.has(producers)) {
-              producersMap.set(producers, producersMap.size + 1);
-            }
+            const awardId = awards.length + 1;
 
-            if (!studiosMap.has(studios)) {
-              studiosMap.set(studios, studiosMap.size + 1);
-            }
-
-            movies.push({
+            awards.push({
+              id: awardId,
               title,
               year,
               winner: winner === "yes",
-              producer_id: producersMap.size,
-              studio_id: studiosMap.size,
+            });
+
+            const producersList = producers.replace(/ and /g, ", ").split(",");
+
+            producersList.forEach((producer) => {
+              const producerName = producer.trim();
+
+              if (!producerName) return;
+
+              if (!producersMap.has(producerName)) {
+                producersMap.set(producerName, producersMap.size + 1);
+              }
+
+              const producerId = producersMap.get(producerName);
+
+              awardsProducers.push({
+                award_id: awardId,
+                producer_id: producerId as number,
+              });
+            });
+
+            const studiosList = studios.replace(/ and /g, ", ").split(",");
+
+            studiosList.forEach((studio) => {
+              const studioName = studio.trim();
+
+              if (!studioName) return;
+
+              if (!studiosMap.has(studioName)) {
+                studiosMap.set(studioName, studiosMap.size + 1);
+              }
+
+              const studioId = studiosMap.get(studioName);
+
+              awardsStudios.push({
+                award_id: awardId,
+                studio_id: studioId as number,
+              });
             });
           })
           .on("end", () => {
@@ -98,7 +132,7 @@ class ProcessCSV {
         id,
       }));
 
-      return { movies, producers, studios };
+      return { awards, producers, studios, awardsProducers, awardsStudios };
     } catch (error) {
       console.log("Error loading CSV files: ", error);
       throw error;
@@ -106,23 +140,35 @@ class ProcessCSV {
   }
 
   private async insertData({
-    movies,
+    awards,
     producers,
     studios,
+    awardsProducers,
+    awardsStudios,
   }: {
-    movies: IMoviesInsertAll[];
+    awards: IAwardsInsertAll[];
     studios: IStudiosInsertAll[];
     producers: IProducersInsertAll[];
+    awardsProducers: IAwardsProducersInsertAll[];
+    awardsStudios: IAwardsStudiosInsertAll[];
   }) {
     try {
       await Promise.all([
-        this.producersRepository.insertAll(producers),
         this.studiosRepository.insertAll(studios),
+        this.producersRepository.insertAll(producers),
       ]);
       console.log("Producers and Studios inserted");
 
-      await this.moviesRepository.insertAll(movies);
-      console.log("Movies inserted");
+      await this.awardsRepository.insertAll(awards);
+      console.log("Awards inserted");
+
+      await Promise.all([
+        this.awardsProducersRepository.insertAll(awardsProducers),
+        this.awardsStudiosRepository.insertAll(awardsStudios),
+      ]);
+      console.log(
+        "Trhough tables awards_producers and awards_studios inserted"
+      );
     } catch (error) {
       throw error;
     }
