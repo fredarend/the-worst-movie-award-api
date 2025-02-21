@@ -1,9 +1,9 @@
 import request from "supertest";
 
-import configDB from "../config/database";
-import processCSV from "../config/processCSV";
+import configDB from "../src/config/database";
+import processCSV from "../src/config/processCSV";
 
-import app from "../app";
+import app from "../src/app";
 
 beforeAll(async () => {
   await configDB();
