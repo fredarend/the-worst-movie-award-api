@@ -5,8 +5,8 @@ const router = Router();
 
 const awardsController = new AwardsController();
 
-router.get("/producers/awards/intervals", (req, res) =>
-  awardsController.producersAwardsIntervals(req, res)
+router.get("/producers/awards/intervals", (req, res, next) =>
+  awardsController.producersAwardsIntervals(req, res, next)
 );
 
 export default router;

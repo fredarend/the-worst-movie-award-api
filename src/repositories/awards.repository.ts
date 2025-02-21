@@ -3,6 +3,7 @@ import {
   IProducersWithMultAwards,
 } from "./../types/awards.types";
 import { AwardsModel } from "../models/awards.model";
+import createHttpError from "http-errors";
 
 export class AwardsRepository {
   model: typeof AwardsModel;
@@ -47,6 +48,10 @@ export class AwardsRepository {
           .whereIn("awards_producers.producer_id", winMoreTimes)
           .orderBy("awards.year", "asc")
       );
+
+      if (!response.length) {
+        throw createHttpError(404, "No producers with multiple awards found");
+      }
 
       return response;
     } catch (error) {
