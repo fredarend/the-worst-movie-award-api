@@ -1,7 +1,6 @@
-import { JSONSchema, Model, RelationMappings } from "objection";
+import { JSONSchema, Model } from "objection";
 
-import { MoviesModel } from "./";
-import { IProducer } from "../types";
+import { IProducer } from "../types/producers.types";
 
 export class ProducersModel extends Model implements IProducer {
   id: number;
@@ -16,20 +15,9 @@ export class ProducersModel extends Model implements IProducer {
     required: ["name"],
     properties: {
       id: { type: "integer" },
-      name: { type: "string", minLength: 1, maxLength: 255 },
-      updated_at: { type: "date" },
-      created_at: { type: "date" },
-    },
-  };
-
-  static relationMappings: RelationMappings = {
-    movies: {
-      relation: Model.HasManyRelation,
-      modelClass: MoviesModel,
-      join: {
-        from: "producers.id",
-        to: "movies.producer_id",
-      },
+      name: { type: "string" },
+      updated_at: { type: "string", format: "date-time" },
+      created_at: { type: "string", format: "date-time" },
     },
   };
 }

@@ -1,14 +1,22 @@
-import knex from "knex";
+import Knex from "knex";
+import { Model } from "objection";
 import path from "path";
 
-export const db = knex({
-  client: "sqlite3",
-  connection: {
-    filename: "./dev.sqlite",
-  },
-  useNullAsDefault: true,
-  migrations: {
-    tableName: "migrations",
-    directory: path.join(__dirname, "../migrations"),
-  },
-});
+export default async () => {
+  const db = Knex({
+    client: "sqlite3",
+    connection: {
+      filename: ":memory:",
+    },
+    useNullAsDefault: true,
+    migrations: {
+      tableName: "migrations",
+      directory: path.join(__dirname, "../migrations"),
+    },
+  });
+
+  Model.knex(db);
+
+  await db.migrate.latest();
+  console.log("Migrations ran successfully!");
+};

@@ -1,12 +1,14 @@
 import { Model, RelationMappings, JSONSchema } from "objection";
 
-import { ProducersModel, StudiosModel } from "./";
-import { IMovie } from "../types";
+import { ProducersModel } from "./producers.model";
+import { StudiosModel } from "./studios.model";
+
+import { IMovie } from "../types/movies.types";
 
 export class MoviesModel extends Model implements IMovie {
   id: number;
   title: string;
-  year: number;
+  year: string;
   winner: boolean;
   studio_id: number;
   producer_id: number;
@@ -20,13 +22,13 @@ export class MoviesModel extends Model implements IMovie {
     required: ["title", "year", "winner", "studio_id", "producer_id"],
     properties: {
       id: { type: "integer" },
-      title: { type: "string", minLength: 1, maxLength: 255 },
-      year: { type: "integer" },
+      title: { type: "string" },
+      year: { type: "string" },
       winner: { type: "boolean" },
       studio_id: { type: "integer" },
       producer_id: { type: "integer" },
-      updated_at: { type: "date" },
-      created_at: { type: "date" },
+      updated_at: { type: "string", format: "date-time" },
+      created_at: { type: "string", format: "date-time" },
     },
   };
 

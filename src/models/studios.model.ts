@@ -1,7 +1,6 @@
-import { JSONSchema, Model, RelationMappings } from "objection";
+import { JSONSchema, Model } from "objection";
 
-import { MoviesModel } from "./";
-import { IStudio } from "../types";
+import { IStudio } from "../types/studios.types";
 
 export class StudiosModel extends Model implements IStudio {
   id: number;
@@ -16,20 +15,9 @@ export class StudiosModel extends Model implements IStudio {
     required: ["name"],
     properties: {
       id: { type: "integer" },
-      name: { type: "string", minLength: 1, maxLength: 255 },
-      updated_at: { type: "date" },
-      created_at: { type: "date" },
-    },
-  };
-
-  static relationMappings: RelationMappings = {
-    movies: {
-      relation: Model.HasManyRelation,
-      modelClass: MoviesModel,
-      join: {
-        from: "studios.id",
-        to: "movies.studio_id",
-      },
+      name: { type: "string" },
+      updated_at: { type: "string", format: "date-time" },
+      created_at: { type: "string", format: "date-time" },
     },
   };
 }
