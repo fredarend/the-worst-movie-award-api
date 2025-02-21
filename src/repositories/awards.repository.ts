@@ -1,4 +1,7 @@
-import { IAwardsInsertAll, IAwardsWithProducer } from "./../types/awards.types";
+import {
+  IAwardsInsertAll,
+  IProducersWithMultAwards,
+} from "./../types/awards.types";
 import { AwardsModel } from "../models/awards.model";
 
 export class AwardsRepository {
@@ -18,22 +21,30 @@ export class AwardsRepository {
     }
   }
 
-  async getAll(): Promise<IAwardsWithProducer[]> {
+  async getProducersWithMultipleWins(): Promise<IProducersWithMultAwards[]> {
     try {
-      const response: IAwardsWithProducer[] = <any>(
+      const winMoreTimes = this.model
+        .query()
+        .select("awards_producers.producer_id")
+        .join("awards_producers", "awards.id", "awards_producers.award_id")
+        .where("awards.winner", true)
+        .groupBy("awards_producers.producer_id")
+        .havingRaw("COUNT(awards_producers.producer_id) > 1");
+
+      const response: IProducersWithMultAwards[] = <any>(
         await this.model
           .query()
           .select(
             "awards.title",
             "awards.year",
             "awards.winner",
-            "awards.producer_id",
+            "awards_producers.producer_id",
             "producers.name as producer_name"
           )
-          .join("producers", "awards.producer_id", "producers.id")
-          .where("awards.winner", true)
-          .groupBy("awards.producer_id", "producers.name")
-          .havingRaw("COUNT(awards.producer_id) > 1")
+          .join("awards_producers", "awards.id", "awards_producers.award_id")
+          .join("producers", "awards_producers.producer_id", "producers.id")
+          .where("winner", true)
+          .whereIn("awards_producers.producer_id", winMoreTimes)
           .orderBy("awards.year", "asc")
       );
 

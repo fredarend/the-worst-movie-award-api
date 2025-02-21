@@ -6,3 +6,10 @@ export interface IProducer {
 }
 
 export type IProducersInsertAll = Pick<IProducer, "id" | "name">;
+
+export type IProducerAwardDetails = {
+  producer: string;
+  previousWin: string;
+  followingWin: string | null;
+  interval: number | null;
+};

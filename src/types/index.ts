@@ -1,4 +1,8 @@
-export { IAward, IAwardsInsertAll, IAwardsWithProducer } from "./awards.types";
+export {
+  IAward,
+  IAwardsInsertAll,
+  IProducersWithMultAwards,
+} from "./awards.types";
 export { IProducer, IProducersInsertAll } from "./producers.types";
 export { IStudio, IStudiosInsertAll } from "./studios.types";
 export {

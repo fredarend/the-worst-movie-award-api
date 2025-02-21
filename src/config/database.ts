@@ -6,8 +6,8 @@ export default async () => {
   const db = Knex({
     client: "sqlite3",
     connection: {
-      // filename: ":memory:",
-      filename: "./dev.sqlite",
+      filename: ":memory:",
+      // filename: "./dev.sqlite",
     },
     useNullAsDefault: true,
     migrations: {

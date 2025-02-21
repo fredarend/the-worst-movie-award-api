@@ -9,9 +9,10 @@ export interface IAward {
 
 export type IAwardsInsertAll = Omit<IAward, "created_at" | "updated_at">;
 
-export type IAwardsWithProducer = Omit<
+export type IProducersWithMultAwards = Omit<
   IAward,
   "id" | "created_at" | "updated_at"
 > & {
   producer_name: string;
+  producer_id: number;
 };
