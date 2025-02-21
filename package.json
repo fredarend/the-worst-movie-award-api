@@ -4,14 +4,20 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsx watch src/server.ts"
+    "start": "tsx watch src/server.ts",
+    "test": "jest"
   },
   "author": "Frederico Arend Binsfeld",
   "license": "ISC",
   "devDependencies": {
     "@types/express": "^5.0.0",
+    "@types/jest": "^29.5.14",
     "@types/node": "^22.13.4",
+    "@types/supertest": "^6.0.2",
     "git-commit-msg-linter": "^5.0.8",
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.2.5",
     "tsx": "^4.19.3"
   },
   "dependencies": {

@@ -3,10 +3,10 @@ import { JSONSchema, Model } from "objection";
 import { IStudio } from "../types/studios.types";
 
 export class StudiosModel extends Model implements IStudio {
-  id: number;
-  name: string;
-  updated_at: Date;
-  created_at: Date;
+  id!: number;
+  name!: string;
+  updated_at!: Date;
+  created_at!: Date;
 
   static tableName = "studios";
 

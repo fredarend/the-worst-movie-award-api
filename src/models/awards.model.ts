@@ -6,12 +6,12 @@ import { StudiosModel } from "./studios.model";
 import { IAward } from "../types/awards.types";
 
 export class AwardsModel extends Model implements IAward {
-  id: number;
-  title: string;
-  year: string;
-  winner: boolean;
-  updated_at: Date;
-  created_at: Date;
+  id!: number;
+  title!: string;
+  year!: string;
+  winner!: boolean;
+  updated_at!: Date;
+  created_at!: Date;
 
   static tableName = "awards";
 

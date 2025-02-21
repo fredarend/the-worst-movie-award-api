@@ -3,11 +3,11 @@ import { Model, JSONSchema } from "objection";
 import { IAwardsStudios } from "../types";
 
 export class AwardsStudiosModel extends Model implements IAwardsStudios {
-  id: number;
-  award_id: number;
-  studio_id: number;
-  updated_at: Date;
-  created_at: Date;
+  id!: number;
+  award_id!: number;
+  studio_id!: number;
+  updated_at!: Date;
+  created_at!: Date;
 
   static tableName = "awards_studios";
 
