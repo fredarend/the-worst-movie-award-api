@@ -10,8 +10,8 @@
 1. Clone o repositório:
 
    ```bash
-   git clone https://github.com/seu-usuario/the-worst-movie-award.git
-   cd the-worst-movie-award
+   git clone https://github.com/seu-usuario/the-worst-movie-award-api.git
+   cd the-worst-movie-award-api
    ```
 
 2. Instale as dependências:
