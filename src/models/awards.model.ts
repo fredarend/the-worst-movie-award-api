@@ -30,18 +30,26 @@ export class AwardsModel extends Model implements IAward {
 
   static relationMappings: RelationMappings = {
     studio: {
-      relation: Model.BelongsToOneRelation,
+      relation: Model.ManyToManyRelation,
       modelClass: StudiosModel,
       join: {
-        from: "awards.studio_id",
+        from: "awards.id",
+        through: {
+          from: "awards_studios.award_id",
+          to: "awards_studios.studio_id",
+        },
         to: "studios.id",
       },
     },
     producer: {
-      relation: Model.BelongsToOneRelation,
+      relation: Model.ManyToManyRelation,
       modelClass: ProducersModel,
       join: {
-        from: "awards.producer_id",
+        from: "awards.id",
+        through: {
+          from: "awards_producers.award_id",
+          to: "awards_producers.producer_id",
+        },
         to: "producers.id",
       },
     },
