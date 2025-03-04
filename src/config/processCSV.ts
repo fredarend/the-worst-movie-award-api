@@ -1,5 +1,7 @@
 import fs from "fs";
 import csvParser from "csv-parser";
+import path from "path";
+import createHttpError from "http-errors";
 
 import {
   ProducersRepository,
@@ -43,10 +45,19 @@ class ProcessCSV {
   async run() {
     try {
       const response = await this.processCSV();
+      console.log("CSV file processed successfully", {
+        awards: response.awards.length,
+        producers: response.producers.length,
+        studios: response.studios.length,
+      });
 
       await this.insertData(response);
     } catch (error) {
-      throw error;
+      if (createHttpError.isHttpError(error)) {
+        throw error;
+      }
+
+      throw createHttpError(500, "Error processing CSV");
     }
   }
 
@@ -58,67 +69,89 @@ class ProcessCSV {
       const awardsProducers: IAwardsProducersInsertAll[] = [];
       const awardsStudios: IAwardsStudiosInsertAll[] = [];
 
-      await new Promise<void>((resolve, reject) => {
-        console.log("Processing CSV file...");
+      const csvFilePath = path.join(__dirname, "../data/movieList.csv");
 
-        fs.createReadStream(`${__dirname}/../data/movieList.csv`)
+      if (!fs.existsSync(csvFilePath)) {
+        throw createHttpError(404, "Arquivo CSV não encontrado");
+      }
+
+      await new Promise<void>((resolve, reject) => {
+        console.log("Processing CSV file", { path: csvFilePath });
+
+        fs.createReadStream(csvFilePath)
           .pipe(csvParser({ separator: ";" }))
           .on("data", (row: ICsvRow) => {
-            const { year, title, winner, producers, studios } = row;
+            try {
+              const { year, title, winner, producers, studios } = row;
 
-            const awardId = awards.length + 1;
-
-            awards.push({
-              id: awardId,
-              title,
-              year,
-              winner: winner === "yes",
-            });
-
-            const producersList = producers.replace(/ and /g, ", ").split(",");
-
-            producersList.forEach((producer) => {
-              const producerName = producer.trim();
-
-              if (!producerName) return;
-
-              if (!producersMap.has(producerName)) {
-                producersMap.set(producerName, producersMap.size + 1);
+              if (!year || !title || !producers || !studios) {
+                console.warn("Linha do CSV com dados inválidos ignorada", {
+                  row,
+                });
+                return;
               }
 
-              const producerId = producersMap.get(producerName);
+              const awardId = awards.length + 1;
 
-              awardsProducers.push({
-                award_id: awardId,
-                producer_id: producerId as number,
+              awards.push({
+                id: awardId,
+                title,
+                year,
+                winner: winner === "yes",
               });
-            });
 
-            const studiosList = studios.replace(/ and /g, ", ").split(",");
+              const producersList = producers
+                .replace(/ and /g, ", ")
+                .split(",");
 
-            studiosList.forEach((studio) => {
-              const studioName = studio.trim();
+              producersList.forEach((producer) => {
+                const producerName = producer.trim();
 
-              if (!studioName) return;
+                if (!producerName) return;
 
-              if (!studiosMap.has(studioName)) {
-                studiosMap.set(studioName, studiosMap.size + 1);
-              }
+                if (!producersMap.has(producerName)) {
+                  producersMap.set(producerName, producersMap.size + 1);
+                }
 
-              const studioId = studiosMap.get(studioName);
+                const producerId = producersMap.get(producerName);
 
-              awardsStudios.push({
-                award_id: awardId,
-                studio_id: studioId as number,
+                awardsProducers.push({
+                  award_id: awardId,
+                  producer_id: producerId as number,
+                });
               });
-            });
+
+              const studiosList = studios.replace(/ and /g, ", ").split(",");
+
+              studiosList.forEach((studio) => {
+                const studioName = studio.trim();
+
+                if (!studioName) return;
+
+                if (!studiosMap.has(studioName)) {
+                  studiosMap.set(studioName, studiosMap.size + 1);
+                }
+
+                const studioId = studiosMap.get(studioName);
+
+                awardsStudios.push({
+                  award_id: awardId,
+                  studio_id: studioId as number,
+                });
+              });
+            } catch (rowError) {
+              console.warn("Erro ao processar linha do CSV", {
+                row,
+                error: (rowError as Error).message,
+              });
+            }
           })
           .on("end", () => {
-            console.log("CSV file successfully processed");
             resolve();
           })
           .on("error", (error) => {
-            reject(error);
+            console.error("Erro ao ler o arquivo CSV", error);
+            reject(createHttpError(500, "Erro ao ler o arquivo CSV"));
           });
       });
 
@@ -134,7 +167,6 @@ class ProcessCSV {
 
       return { awards, producers, studios, awardsProducers, awardsStudios };
     } catch (error) {
-      console.log("Error loading CSV files: ", error);
       throw error;
     }
   }
@@ -157,20 +189,25 @@ class ProcessCSV {
         this.studiosRepository.insertAll(studios),
         this.producersRepository.insertAll(producers),
       ]);
-      console.log("Producers and Studios inserted");
+      console.log("Producers and studios inserted successfully");
 
       await this.awardsRepository.insertAll(awards);
-      console.log("Awards inserted");
+      console.log("Awards inserted successfully");
 
       await Promise.all([
         this.awardsProducersRepository.insertAll(awardsProducers),
         this.awardsStudiosRepository.insertAll(awardsStudios),
       ]);
       console.log(
-        "Trhough tables awards_producers and awards_studios inserted"
+        "Join tables awards_producers and awards_studios inserted successfully"
       );
     } catch (error) {
-      throw error;
+      if (createHttpError.isHttpError(error)) {
+        throw error;
+      }
+
+      console.error("Error inserting data into the database:", error);
+      throw createHttpError(500, "Error inserting data into the database");
     }
   }
 }

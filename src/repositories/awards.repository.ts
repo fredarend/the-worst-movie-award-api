@@ -1,9 +1,9 @@
+import createHttpError from "http-errors";
 import {
   IAwardsInsertAll,
   IProducersWithMultAwards,
 } from "./../types/awards.types";
 import { AwardsModel } from "../models/awards.model";
-import createHttpError from "http-errors";
 
 export class AwardsRepository {
   model: typeof AwardsModel;
@@ -18,7 +18,8 @@ export class AwardsRepository {
         await this.model.query().insert(award);
       }
     } catch (error) {
-      throw error;
+      console.error("Error inserting awards into the database:", error);
+      throw createHttpError(500, "Error inserting awards into the database");
     }
   }
 
@@ -55,7 +56,15 @@ export class AwardsRepository {
 
       return response;
     } catch (error) {
-      throw error;
+      if (createHttpError.isHttpError(error)) {
+        throw error;
+      }
+
+      console.error("Error fetching producers with multiple awards:", error);
+      throw createHttpError(
+        500,
+        "Error fetching producers with multiple awards."
+      );
     }
   }
 }

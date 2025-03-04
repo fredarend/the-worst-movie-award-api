@@ -1,6 +1,5 @@
-import createHttpError from "http-errors";
 import { NextFunction, Request, Response } from "express";
-
+import createHttpError from "http-errors";
 import { AwardsService } from "../services/awards.service";
 
 export class AwardsController {
@@ -10,7 +9,7 @@ export class AwardsController {
   }
 
   async producersAwardsIntervals(
-    _: Request,
+    req: Request,
     res: Response,
     next: NextFunction
   ) {
@@ -18,6 +17,7 @@ export class AwardsController {
       const awards = await this.awardsService.awardsIntervals();
       res.status(200).json(awards);
     } catch (error) {
+      console.error("Error processing award intervals request:", error);
       next(error);
     }
   }

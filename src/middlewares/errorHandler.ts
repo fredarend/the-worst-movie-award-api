@@ -6,10 +6,23 @@ export const errorHandler = (
   req: Request,
   res: Response,
   next: NextFunction
-) => {
+): void => {
   if (createHttpError.isHttpError(err)) {
-    res.status(err.status).json({ error: err.message });
-  } else {
-    res.status(500).json({ error: "Internal Server Error" });
+    console.error(`[ERROR ${err.status}] ${err.message}`);
+
+    res.status(err.status).json({
+      status: "error",
+      message: err.message,
+      code: err.status,
+    });
+    return;
   }
+
+  console.error("[INTERNAL SERVER ERROR]", err);
+
+  res.status(500).json({
+    status: "error",
+    message: err.message || "Internal server error",
+    stack: err.stack,
+  });
 };

@@ -1,3 +1,4 @@
+import createHttpError from "http-errors";
 import { AwardsStudiosModel } from "../models/awardsStudios.model";
 import { IAwardsStudiosInsertAll } from "../types";
 
@@ -14,7 +15,11 @@ export class AwardsStudiosRepository {
         await this.model.query().insert(awardStudio);
       }
     } catch (error) {
-      throw error;
+      console.error("Error inserting awards studios into the database:", error);
+      throw createHttpError(
+        500,
+        "Error inserting awards studios into the database"
+      );
     }
   }
 }

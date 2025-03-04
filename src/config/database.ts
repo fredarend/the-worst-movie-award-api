@@ -7,7 +7,6 @@ export default async () => {
     client: "sqlite3",
     connection: {
       filename: ":memory:",
-      // filename: "./dev.sqlite",
     },
     useNullAsDefault: true,
     migrations: {

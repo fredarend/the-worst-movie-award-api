@@ -1,6 +1,7 @@
 import { Model } from "objection";
 import { ProducersModel } from "../models/producers.model";
 import { IProducersInsertAll } from "../types/producers.types";
+import createHttpError from "http-errors";
 
 export class ProducersRepository {
   model: typeof Model;
@@ -15,7 +16,8 @@ export class ProducersRepository {
         await this.model.query().insert(producer);
       }
     } catch (error) {
-      throw error;
+      console.error("Error inserting producers into the database:", error);
+      throw createHttpError(500, "Error inserting producers into the database");
     }
   }
 }

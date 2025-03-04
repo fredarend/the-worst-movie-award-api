@@ -1,6 +1,7 @@
 import { AwardsRepository } from "../repositories/awards.repository";
 import { IProducersWithMultAwards } from "../types/awards.types";
 import { IProducerAwardDetails } from "../types/producers.types";
+import createHttpError from "http-errors";
 
 export class AwardsService {
   private awardsRepository: AwardsRepository;
@@ -11,7 +12,6 @@ export class AwardsService {
   async awardsIntervals() {
     try {
       const awards = await this.awardsRepository.getProducersWithMultipleWins();
-
       const { min, max } = this.intervals(awards);
 
       return {
@@ -19,7 +19,12 @@ export class AwardsService {
         max,
       };
     } catch (error) {
-      throw error;
+      if (createHttpError.isHttpError(error)) {
+        throw error;
+      }
+
+      console.error("Error processing award intervals:", error);
+      throw createHttpError(500, "Error processing award intervals");
     }
   }
 
@@ -31,7 +36,10 @@ export class AwardsService {
       let j = 1;
 
       while (i < awards.length) {
-        if (awards[i].producer_id === awards[j].producer_id) {
+        if (
+          j < awards.length &&
+          awards[i].producer_id === awards[j].producer_id
+        ) {
           const previousWin = Number(awards[i].year),
             followingWin = Number(awards[j].year);
           const interval = followingWin - previousWin;
@@ -61,6 +69,10 @@ export class AwardsService {
         }
       }
 
+      if (intervals.size === 0) {
+        return { min: [], max: [] };
+      }
+
       let min: IProducerAwardDetails[] = [];
       let max: IProducerAwardDetails[] = [];
 
@@ -68,6 +80,7 @@ export class AwardsService {
         if (!min.length && !max.length) {
           min.push(...i[1]);
           max.push(...i[1]);
+          continue;
         }
 
         if (min[0].interval > i[0]) {
@@ -86,8 +99,8 @@ export class AwardsService {
         max,
       };
     } catch (error) {
-      console.log("error", error);
-      throw error;
+      console.error("Error calculating award intervals:", error);
+      throw createHttpError(500, "Error calculating award intervals");
     }
   }
 }
