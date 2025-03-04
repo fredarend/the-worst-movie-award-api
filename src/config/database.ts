@@ -16,8 +16,9 @@ export default async () => {
     },
   });
 
+  await db.migrate.latest();
+
   Model.knex(db);
 
-  await db.migrate.latest();
   console.log("Migrations ran successfully!");
 };

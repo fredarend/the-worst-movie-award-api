@@ -24,7 +24,7 @@ export class ProducersModel extends Model implements IProducer {
   static relationMappings: RelationMappings = {
     awards: {
       relation: Model.ManyToManyRelation,
-      modelClass: AwardsModel,
+      modelClass: `${__dirname}/awards.model`,
       join: {
         from: "producers.id",
         through: {

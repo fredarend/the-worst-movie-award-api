@@ -31,7 +31,7 @@ export class AwardsModel extends Model implements IAward {
   static relationMappings: RelationMappings = {
     studio: {
       relation: Model.ManyToManyRelation,
-      modelClass: StudiosModel,
+      modelClass: `${__dirname}/studios.model`,
       join: {
         from: "awards.id",
         through: {
@@ -43,7 +43,7 @@ export class AwardsModel extends Model implements IAward {
     },
     producer: {
       relation: Model.ManyToManyRelation,
-      modelClass: ProducersModel,
+      modelClass: `${__dirname}/producers.model`,
       join: {
         from: "awards.id",
         through: {

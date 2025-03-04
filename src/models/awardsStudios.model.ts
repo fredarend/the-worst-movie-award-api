@@ -27,7 +27,7 @@ export class AwardsStudiosModel extends Model implements IAwardsStudios {
   static relationMappings: RelationMappings = {
     award: {
       relation: Model.BelongsToOneRelation,
-      modelClass: AwardsModel,
+      modelClass: `${__dirname}/awards.model`,
       join: {
         from: "awards_studios.award_id",
         to: "awards.id",
@@ -35,7 +35,7 @@ export class AwardsStudiosModel extends Model implements IAwardsStudios {
     },
     studio: {
       relation: Model.BelongsToOneRelation,
-      modelClass: StudiosModel,
+      modelClass: `${__dirname}/studios.model`,
       join: {
         from: "awards_studios.studio_id",
         to: "studios.id",

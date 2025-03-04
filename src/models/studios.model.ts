@@ -24,7 +24,7 @@ export class StudiosModel extends Model implements IStudio {
   static relationMappings: RelationMappings = {
     awards: {
       relation: Model.ManyToManyRelation,
-      modelClass: AwardsModel,
+      modelClass: `${__dirname}/awards.model`,
       join: {
         from: "studios.id",
         through: {
