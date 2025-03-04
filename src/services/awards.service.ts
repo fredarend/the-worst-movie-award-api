@@ -12,7 +12,7 @@ export class AwardsService {
   async awardsIntervals() {
     try {
       const awards = await this.awardsRepository.getProducersWithMultipleWins();
-      const { min, max } = this.intervals(awards);
+      const { min, max } = this.generateMinMaxIntervals(awards);
 
       return {
         min,
@@ -28,7 +28,7 @@ export class AwardsService {
     }
   }
 
-  private intervals(awards: IProducersWithMultAwards[]) {
+  private generateMinMaxIntervals(awards: IProducersWithMultAwards[]) {
     try {
       const intervals = new Map<number, IProducerAwardDetails[]>();
 
