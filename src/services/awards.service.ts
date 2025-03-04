@@ -61,7 +61,9 @@ export class AwardsService {
           j = i;
         }
 
-        if (j === awards.length - 1) {
+        const jReachedEnd = j === awards.length - 1;
+
+        if (jReachedEnd) {
           i++;
           j = i + 1 || i;
         } else {
