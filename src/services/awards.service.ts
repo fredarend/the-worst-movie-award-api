@@ -11,6 +11,7 @@ export class AwardsService {
   async awardsIntervals() {
     try {
       const awards = await this.awardsRepository.getProducersWithMultipleWins();
+
       const { min, max } = this.intervals(awards);
 
       return {
@@ -24,57 +25,68 @@ export class AwardsService {
 
   private intervals(awards: IProducersWithMultAwards[]) {
     try {
-      const intervals = new Map<number, IProducerAwardDetails>();
+      const intervals = new Map<number, IProducerAwardDetails[]>();
 
-      for (const award of awards) {
-        if (!intervals.has(award.producer_id)) {
-          intervals.set(award.producer_id, {
-            producer: award.producer_name,
-            previousWin: award.year,
-            followingWin: null,
-            interval: null,
-          });
-        } else {
-          const producer = intervals.get(award.producer_id);
+      let i = 0;
+      let j = 1;
 
-          if (producer) {
-            if (producer.followingWin !== null) {
-              producer.previousWin = producer.followingWin;
-            }
+      while (i < awards.length) {
+        if (awards[i].producer_id === awards[j].producer_id) {
+          const previousWin = Number(awards[i].year),
+            followingWin = Number(awards[j].year);
+          const interval = followingWin - previousWin;
 
-            const interval = Number(award.year) - Number(producer?.previousWin);
+          const awardDetail: IProducerAwardDetails = {
+            producer: awards[i].producer_name,
+            interval: interval,
+            previousWin: previousWin,
+            followingWin: followingWin,
+          };
 
-            producer.interval = interval;
-            producer.followingWin = award.year;
+          if (intervals.has(interval)) {
+            intervals.get(interval)?.push(awardDetail);
+          } else {
+            intervals.set(interval, [awardDetail]);
           }
+
+          i++;
+          j = i;
+        }
+
+        if (j === awards.length - 1) {
+          i++;
+          j = i + 1 || i;
+        } else {
+          j++;
         }
       }
 
-      const intervalsArray = Array.from(intervals.values());
+      let min: IProducerAwardDetails[] = [];
+      let max: IProducerAwardDetails[] = [];
 
-      const minInterval = Math.min(
-        ...intervalsArray.map((i) => i.interval as number)
-      );
-      const maxInterval = Math.max(
-        ...intervalsArray.map((i) => i.interval as number)
-      );
-
-      const min: IProducerAwardDetails[] = [];
-      const max: IProducerAwardDetails[] = [];
-
-      intervalsArray.forEach((i) => {
-        if (i.interval === minInterval) {
-          min.push(i);
-        } else if (i.interval === maxInterval) {
-          max.push(i);
+      for (const i of intervals) {
+        if (!min.length && !max.length) {
+          min.push(...i[1]);
+          max.push(...i[1]);
         }
-      });
+
+        if (min[0].interval > i[0]) {
+          min = [];
+          min.push(...i[1]);
+        }
+
+        if (max[0].interval < i[0]) {
+          max = [];
+          max.push(...i[1]);
+        }
+      }
 
       return {
         min,
         max,
       };
     } catch (error) {
+      console.log("error", error);
       throw error;
     }
   }

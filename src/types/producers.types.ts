@@ -9,7 +9,7 @@ export type IProducersInsertAll = Pick<IProducer, "id" | "name">;
 
 export type IProducerAwardDetails = {
   producer: string;
-  previousWin: string;
-  followingWin: string | null;
-  interval: number | null;
+  previousWin: number;
+  followingWin: number;
+  interval: number;
 };
