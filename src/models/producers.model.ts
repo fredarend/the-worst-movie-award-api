@@ -1,5 +1,5 @@
-import { JSONSchema, Model } from "objection";
-
+import { JSONSchema, Model, RelationMappings } from "objection";
+import { AwardsModel } from "./awards.model";
 import { IProducer } from "../types/producers.types";
 
 export class ProducersModel extends Model implements IProducer {
@@ -18,6 +18,21 @@ export class ProducersModel extends Model implements IProducer {
       name: { type: "string" },
       updated_at: { type: "string", format: "date-time" },
       created_at: { type: "string", format: "date-time" },
+    },
+  };
+
+  static relationMappings: RelationMappings = {
+    awards: {
+      relation: Model.ManyToManyRelation,
+      modelClass: AwardsModel,
+      join: {
+        from: "producers.id",
+        through: {
+          from: "awards_producers.producer_id",
+          to: "awards_producers.award_id",
+        },
+        to: "awards.id",
+      },
     },
   };
 }

@@ -1,5 +1,6 @@
-import { Model, JSONSchema } from "objection";
-
+import { Model, JSONSchema, RelationMappings } from "objection";
+import { AwardsModel } from "./awards.model";
+import { ProducersModel } from "./producers.model";
 import { IAwardsProducers } from "../types";
 
 export class AwardsProducersModel extends Model implements IAwardsProducers {
@@ -20,6 +21,25 @@ export class AwardsProducersModel extends Model implements IAwardsProducers {
       producer_id: { type: "integer" },
       updated_at: { type: "string", format: "date-time" },
       created_at: { type: "string", format: "date-time" },
+    },
+  };
+
+  static relationMappings: RelationMappings = {
+    award: {
+      relation: Model.BelongsToOneRelation,
+      modelClass: AwardsModel,
+      join: {
+        from: "awards_producers.award_id",
+        to: "awards.id",
+      },
+    },
+    producer: {
+      relation: Model.BelongsToOneRelation,
+      modelClass: ProducersModel,
+      join: {
+        from: "awards_producers.producer_id",
+        to: "producers.id",
+      },
     },
   };
 }
