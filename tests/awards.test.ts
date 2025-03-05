@@ -18,22 +18,22 @@ describe("GET /producers/awards/intervals", () => {
 
     expect(response.body).toEqual(
       expect.objectContaining({
-        min: expect.arrayContaining([
-          expect.objectContaining({
-            producer: expect.any(String),
-            previousWin: expect.any(String),
-            followingWin: expect.any(String),
-            interval: expect.any(Number),
-          }),
-        ]),
-        max: expect.arrayContaining([
-          expect.objectContaining({
-            producer: expect.any(String),
-            previousWin: expect.any(String),
-            followingWin: expect.any(String),
-            interval: expect.any(Number),
-          }),
-        ]),
+        min: [
+          {
+            producer: "Joel Silver",
+            interval: 1,
+            previousWin: 1990,
+            followingWin: 1991,
+          },
+        ],
+        max: [
+          {
+            producer: "Matthew Vaughn",
+            interval: 13,
+            previousWin: 2002,
+            followingWin: 2015,
+          },
+        ],
       })
     );
   });
