@@ -1,4 +1,5 @@
 import createHttpError from "http-errors";
+import { injectable } from "inversify";
 import {
   IAwardsInsertAll,
   IProducersWithMultAwards,
@@ -6,6 +7,7 @@ import {
 import { AwardsModel } from "../models/awards.model";
 import { IAwardsRepository } from "./interfaces/awards.repository.interface";
 
+@injectable()
 export class AwardsRepository implements IAwardsRepository {
   private readonly model: typeof AwardsModel;
 

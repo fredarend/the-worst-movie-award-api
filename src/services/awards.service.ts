@@ -1,10 +1,16 @@
+import { inject, injectable } from "inversify";
 import { IAwardsRepository } from "../repositories/interfaces/awards.repository.interface";
 import { IProducersWithMultAwards } from "../types/awards.types";
 import { IProducerAwardDetails } from "../types/producers.types";
 import createHttpError from "http-errors";
+import { TYPES } from "../types/di.types";
 
+@injectable()
 export class AwardsService {
-  constructor(private readonly awardsRepository: IAwardsRepository) {}
+  constructor(
+    @inject(TYPES.AwardsRepository)
+    private readonly awardsRepository: IAwardsRepository
+  ) {}
 
   async awardsIntervals() {
     try {

@@ -1,18 +1,18 @@
 import { NextFunction, Request, Response } from "express";
-import createHttpError from "http-errors";
 import { AwardsService } from "../services/awards.service";
+import { controller, httpGet } from "inversify-express-utils";
+import { inject, injectable } from "inversify";
+import { TYPES } from "../types/di.types";
 
+@controller("/api/producers")
 export class AwardsController {
-  private awardsService: AwardsService;
-  constructor() {
-    this.awardsService = new AwardsService();
-  }
+  constructor(
+    @inject(TYPES.AwardsService)
+    private readonly awardsService: AwardsService
+  ) {}
 
-  async producersAwardsIntervals(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) {
+  @httpGet("/awards/intervals")
+  async getAwardsIntervals(req: Request, res: Response, next: NextFunction) {
     try {
       const awards = await this.awardsService.awardsIntervals();
       res.status(200).json(awards);
