@@ -21,7 +21,8 @@ import {
   IAwardsProducersRepository,
   IAwardsStudiosRepository,
 } from "../repositories/interfaces";
-import ProcessCSV from "./processCSV";
+import ProcessCSV from "../data/processors/processCSV.processor";
+import { IProcessCSV } from "../data/interfaces/processCSV.interface";
 
 const container = new Container();
 
@@ -60,6 +61,6 @@ container
   .to(AwardsStudiosRepository)
   .inSingletonScope();
 
-container.bind<ProcessCSV>(TYPES.ProcessCSV).to(ProcessCSV).inSingletonScope();
+container.bind<IProcessCSV>(TYPES.ProcessCSV).to(ProcessCSV).inSingletonScope();
 
 export { container };

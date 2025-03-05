@@ -1,20 +1,27 @@
 import app from "./app";
-import processCSV from "./config/processCSV";
+
 import configDB from "./config/database";
 import { container } from "./config/container";
+
+import ProcessCSV from "./data/processors/processCSV.processor";
+
 import { TYPES } from "./types";
-import ProcessCSV from "./config/processCSV";
 
 const server = async () => {
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  try {
+    await configDB();
 
-  await configDB();
+    const processCSV = container.get<ProcessCSV>(TYPES.ProcessCSV);
+    await processCSV.run();
 
-  const processCSV = container.get<ProcessCSV>(TYPES.ProcessCSV);
-  await processCSV.run();
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
-  console.log("Setup completed!");
+    console.log("Setup completed!");
+  } catch (error) {
+    console.error("Error initializing server.");
+    process.exit(1);
+  }
 };
 
 server();

@@ -1,12 +1,17 @@
 import request from "supertest";
 
 import configDB from "../src/config/database";
-import processCSV from "../src/config/processCSV";
 
 import app from "../src/app";
+import { container } from "../src/config/container";
+import { TYPES } from "../src/types";
+import { IProcessCSV } from "../src/data/interfaces/processCSV.interface";
 
 beforeAll(async () => {
   await configDB();
+
+  const processCSV = container.get<IProcessCSV>(TYPES.ProcessCSV);
+
   await processCSV.run();
 });
 
