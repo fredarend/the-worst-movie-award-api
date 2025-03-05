@@ -1,13 +1,10 @@
-import { AwardsRepository } from "../repositories/awards.repository";
+import { IAwardsRepository } from "../repositories/interfaces/awards.repository.interface";
 import { IProducersWithMultAwards } from "../types/awards.types";
 import { IProducerAwardDetails } from "../types/producers.types";
 import createHttpError from "http-errors";
 
 export class AwardsService {
-  private awardsRepository: AwardsRepository;
-  constructor() {
-    this.awardsRepository = new AwardsRepository();
-  }
+  constructor(private readonly awardsRepository: IAwardsRepository) {}
 
   async awardsIntervals() {
     try {

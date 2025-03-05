@@ -4,15 +4,16 @@ import {
   IProducersWithMultAwards,
 } from "./../types/awards.types";
 import { AwardsModel } from "../models/awards.model";
+import { IAwardsRepository } from "./interfaces/awards.repository.interface";
 
-export class AwardsRepository {
-  model: typeof AwardsModel;
+export class AwardsRepository implements IAwardsRepository {
+  private readonly model: typeof AwardsModel;
 
   constructor() {
     this.model = AwardsModel;
   }
 
-  async insertAll(awards: IAwardsInsertAll[]) {
+  async insertAll(awards: IAwardsInsertAll[]): Promise<void> {
     try {
       for (const award of awards) {
         await this.model.query().insert(award);
@@ -33,28 +34,26 @@ export class AwardsRepository {
         .groupBy("awards_producers.producer_id")
         .havingRaw("COUNT(awards_producers.producer_id) > 1");
 
-      const response: IProducersWithMultAwards[] = <any>(
-        await this.model
-          .query()
-          .select(
-            "awards.title",
-            "awards.year",
-            "awards.winner",
-            "awards_producers.producer_id",
-            "producers.name as producer_name"
-          )
-          .join("awards_producers", "awards.id", "awards_producers.award_id")
-          .join("producers", "awards_producers.producer_id", "producers.id")
-          .where("winner", true)
-          .whereIn("awards_producers.producer_id", winMoreTimes)
-          .orderBy("awards.year", "asc")
-      );
+      const response = await this.model
+        .query()
+        .select(
+          "awards.title",
+          "awards.year",
+          "awards.winner",
+          "awards_producers.producer_id",
+          "producers.name as producer_name"
+        )
+        .join("awards_producers", "awards.id", "awards_producers.award_id")
+        .join("producers", "awards_producers.producer_id", "producers.id")
+        .where("winner", true)
+        .whereIn("awards_producers.producer_id", winMoreTimes)
+        .orderBy("awards.year", "asc");
 
       if (!response.length) {
         throw createHttpError(404, "No producers with multiple awards found");
       }
 
-      return response;
+      return response as unknown as IProducersWithMultAwards[];
     } catch (error) {
       if (createHttpError.isHttpError(error)) {
         throw error;
