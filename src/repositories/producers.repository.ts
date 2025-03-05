@@ -1,16 +1,19 @@
-import { Model } from "objection";
-import { ProducersModel } from "../models/producers.model";
-import { IProducersInsertAll } from "../types/producers.types";
+import { injectable } from "inversify";
 import createHttpError from "http-errors";
 
-export class ProducersRepository {
-  model: typeof Model;
+import { ProducersModel } from "../models/producers.model";
+import { IProducersInsertAll } from "../types/producers.types";
+import { IProducersRepository } from "./interfaces";
+
+@injectable()
+export class ProducersRepository implements IProducersRepository {
+  private readonly model: typeof ProducersModel;
 
   constructor() {
     this.model = ProducersModel;
   }
 
-  async insertAll(producers: IProducersInsertAll[]) {
+  async insertAll(producers: IProducersInsertAll[]): Promise<void> {
     try {
       for (const producer of producers) {
         await this.model.query().insert(producer);

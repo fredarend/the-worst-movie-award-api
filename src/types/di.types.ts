@@ -6,4 +6,5 @@ export const TYPES = {
   StudiosRepository: Symbol.for("StudiosRepository"),
   AwardsProducersRepository: Symbol.for("AwardsProducersRepository"),
   AwardsStudiosRepository: Symbol.for("AwardsStudiosRepository"),
+  ProcessCSV: Symbol.for("ProcessCSV"),
 };

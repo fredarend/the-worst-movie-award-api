@@ -21,6 +21,7 @@ import {
   IAwardsProducersRepository,
   IAwardsStudiosRepository,
 } from "../repositories/interfaces";
+import ProcessCSV from "./processCSV";
 
 const container = new Container();
 
@@ -58,5 +59,7 @@ container
   .bind<IAwardsStudiosRepository>(TYPES.AwardsStudiosRepository)
   .to(AwardsStudiosRepository)
   .inSingletonScope();
+
+container.bind<ProcessCSV>(TYPES.ProcessCSV).to(ProcessCSV).inSingletonScope();
 
 export { container };

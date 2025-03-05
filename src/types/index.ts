@@ -10,3 +10,4 @@ export {
   IAwardsProducersInsertAll,
 } from "./awardsProducers.types";
 export { IAwardsStudios, IAwardsStudiosInsertAll } from "./awardsStudios.types";
+export { TYPES } from "./di.types";

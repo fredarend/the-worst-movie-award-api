@@ -2,14 +2,7 @@ import fs from "fs";
 import csvParser from "csv-parser";
 import path from "path";
 import createHttpError from "http-errors";
-
-import {
-  ProducersRepository,
-  AwardsRepository,
-  StudiosRepository,
-  AwardsProducersRepository,
-  AwardsStudiosRepository,
-} from "../repositories";
+import { inject, injectable } from "inversify";
 
 import {
   IAwardsInsertAll,
@@ -17,30 +10,32 @@ import {
   IAwardsStudiosInsertAll,
   IProducersInsertAll,
   IStudiosInsertAll,
+  TYPES,
 } from "../types";
 
-interface ICsvRow {
-  title: string;
-  year: string;
-  studios: string;
-  producers: string;
-  winner: "yes" | null;
-}
+import {
+  IAwardsProducersRepository,
+  IAwardsRepository,
+  IAwardsStudiosRepository,
+  IProducersRepository,
+  IStudiosRepository,
+} from "../repositories/interfaces";
+import { ICsvRow } from "../types/processCSV.types";
 
+@injectable()
 class ProcessCSV {
-  private readonly studiosRepository: StudiosRepository;
-  private readonly producersRepository: ProducersRepository;
-  private readonly awardsRepository: AwardsRepository;
-  private readonly awardsProducersRepository: AwardsProducersRepository;
-  private readonly awardsStudiosRepository: AwardsStudiosRepository;
-
-  constructor() {
-    this.studiosRepository = new StudiosRepository();
-    this.producersRepository = new ProducersRepository();
-    this.awardsRepository = new AwardsRepository();
-    this.awardsProducersRepository = new AwardsProducersRepository();
-    this.awardsStudiosRepository = new AwardsStudiosRepository();
-  }
+  constructor(
+    @inject(TYPES.AwardsRepository)
+    private readonly awardsRepository: IAwardsRepository,
+    @inject(TYPES.ProducersRepository)
+    private readonly producersRepository: IProducersRepository,
+    @inject(TYPES.StudiosRepository)
+    private readonly studiosRepository: IStudiosRepository,
+    @inject(TYPES.AwardsProducersRepository)
+    private readonly awardsProducersRepository: IAwardsProducersRepository,
+    @inject(TYPES.AwardsStudiosRepository)
+    private readonly awardsStudiosRepository: IAwardsStudiosRepository
+  ) {}
 
   async run() {
     try {
@@ -212,4 +207,4 @@ class ProcessCSV {
   }
 }
 
-export default new ProcessCSV();
+export default ProcessCSV;

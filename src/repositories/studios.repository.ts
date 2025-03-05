@@ -1,15 +1,19 @@
 import createHttpError from "http-errors";
+import { injectable } from "inversify";
+
 import { StudiosModel } from "../models/studios.model";
 import { IStudiosInsertAll } from "../types/studios.types";
+import { IStudiosRepository } from "./interfaces";
 
-export class StudiosRepository {
-  model: typeof StudiosModel;
+@injectable()
+export class StudiosRepository implements IStudiosRepository {
+  private readonly model: typeof StudiosModel;
 
   constructor() {
     this.model = StudiosModel;
   }
 
-  async insertAll(studios: IStudiosInsertAll[]) {
+  async insertAll(studios: IStudiosInsertAll[]): Promise<void> {
     try {
       for (const studio of studios) {
         await this.model.query().insert(studio);
