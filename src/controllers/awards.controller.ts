@@ -3,6 +3,7 @@ import { AwardsService } from "../services/awards.service";
 import { controller, httpGet } from "inversify-express-utils";
 import { inject, injectable } from "inversify";
 import { TYPES } from "../types/di.types";
+import { ApiResponse } from "../types/api.types";
 
 @controller("/api/producers")
 export class AwardsController {
@@ -15,7 +16,14 @@ export class AwardsController {
   async getAwardsIntervals(req: Request, res: Response, next: NextFunction) {
     try {
       const awards = await this.awardsService.awardsIntervals();
-      res.status(200).json(awards);
+
+      const response: ApiResponse<typeof awards> = {
+        status: "sucess",
+        data: awards,
+        code: 200,
+      };
+
+      res.status(200).json(response);
     } catch (error) {
       console.error("Error processing award intervals request:", error);
       next(error);
