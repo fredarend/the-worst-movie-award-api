@@ -1,10 +1,26 @@
 import "reflect-metadata"; // Isso precisa ser importado uma vez, geralmente no início da aplicação
 import { Container } from "inversify";
+
 import { TYPES } from "../types/di.types";
-import { IAwardsRepository } from "../repositories/interfaces/awards.repository.interface";
-import { AwardsRepository } from "../repositories/awards.repository";
+
 import { AwardsService } from "../services/awards.service";
 import { AwardsController } from "../controllers/awards.controller";
+
+import {
+  ProducersRepository,
+  AwardsRepository,
+  StudiosRepository,
+  AwardsProducersRepository,
+  AwardsStudiosRepository,
+} from "../repositories";
+
+import {
+  IProducersRepository,
+  IAwardsRepository,
+  IStudiosRepository,
+  IAwardsProducersRepository,
+  IAwardsStudiosRepository,
+} from "../repositories/interfaces";
 
 const container = new Container();
 
@@ -21,6 +37,26 @@ container
 container
   .bind<AwardsController>(TYPES.AwardsController)
   .to(AwardsController)
+  .inSingletonScope();
+
+container
+  .bind<IProducersRepository>(TYPES.ProducersRepository)
+  .to(ProducersRepository)
+  .inSingletonScope();
+
+container
+  .bind<IStudiosRepository>(TYPES.StudiosRepository)
+  .to(StudiosRepository)
+  .inSingletonScope();
+
+container
+  .bind<IAwardsProducersRepository>(TYPES.AwardsProducersRepository)
+  .to(AwardsProducersRepository)
+  .inSingletonScope();
+
+container
+  .bind<IAwardsStudiosRepository>(TYPES.AwardsStudiosRepository)
+  .to(AwardsStudiosRepository)
   .inSingletonScope();
 
 export { container };
